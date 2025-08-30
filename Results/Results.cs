@@ -4,18 +4,23 @@ namespace newapi.results;
 
 public class UserResult
 {
-    public UserResult(bool Success, string? Error, User? User)
+    public UserResult(bool Success, List<string?> Error, User? User)
     {
         this.Success = Success;
-        this.Error = Error;
+        this.Errors = Error;
         this.User = User;
     }
-    public bool Success = default!;
-    private readonly string? Error;
-    public User? User { get; set; }
-
-    public string? GetError()
+    public UserResult(bool Success, List<string?> Error)
     {
-        return Error;
+        this.Success = Success;
+        this.Errors = Error;
+    }
+    public bool Success = default!;
+    private readonly List<string?> Errors;
+    public User? User { get; private set; }
+
+    public List<string?> GetErrors()
+    {
+        return Errors;
     }
 }
