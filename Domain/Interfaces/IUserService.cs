@@ -1,7 +1,7 @@
 using newapi.domain.dtos;
 using newapi.results;
 
-namespace newapi.infra.interfaces;
+namespace newapi.domain.interfaces;
 
 public interface IUserService
 {
