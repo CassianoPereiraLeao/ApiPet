@@ -11,17 +11,25 @@ public static class UserRoute
     {
         var route = app.MapGroup("/api/users");
 
-        route.MapGet("/", async ([FromQuery] int? page,IUserService userService) =>
+        route.MapGet("/", async ([FromQuery] int? page, IUserService userService) =>
         {
             var response = await userService.GetAllUsers(page);
-            if (response.Success == false)
+            if (!response.Success)
             {
                 return Results.Json(new { errors = response.GetErrors() }, statusCode: 400);
             }
             return Results.Json(new { users = response.UsersResponse}, statusCode: 200);
         }).WithTags("Users");
 
-        route.MapGet("/{id}", ([FromRoute] string id) => "Implementar dps mó preguiça").WithTags("Users");
+        route.MapGet("/{id}", async ([FromRoute] string id, IUserService userService) =>
+        {
+            var response = await userService.GetUserById(Guid.Parse(id));
+            if (!response.Success)
+            {
+                return Results.Json(new { errors = response.GetErrors() }, statusCode: 400);
+            }
+            return Results.Json(new { user = response.User }, statusCode: 200);
+        }).WithTags("Users");
 
         route.MapPost("/login", async ([FromBody] UserRequest userRequest, IUserService userService) =>
         {
@@ -30,7 +38,7 @@ public static class UserRoute
                 userRequest.Password);
 
             var response = await userService.CreateUser(user);
-            if (response.Success == false)
+            if (!response.Success)
             {
                 return Results.Json(new { errors = response.GetErrors() }, statusCode: 400);
             }

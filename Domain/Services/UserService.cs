@@ -17,27 +17,33 @@ public class UserService : IUserService
     public async Task<UserResult> GetAllUsers(int? page)
     {
         int limit = 30;
-        List<string?> errors = [];
         var users = await _repository.GetAll(page, limit);
         if (users == null)
         {
-            errors.Add("Erro ao listar os usuários");
-            return new UserResult(false, errors);
+            return new UserResult(false, ["Erro ao listar os usuários"]);
         }
         
-        var usersModify = new List<UserDTOResponse>();
+        var usersResponse = new List<UserDTOResponse>();
 
         foreach (var user in users)
         {
-            usersModify.Add(new UserDTOResponse(user.Id, user.Name, user.Email, user.PetId));
+            usersResponse.Add(new UserDTOResponse(user.Id, user.Name, user.Email, user.PetId));
         }
 
-        return new UserResult(true, errors, usersResponse: usersModify);
+        return new UserResult(true, [], usersResponse: usersResponse);
     }
 
-    public Task<UserResult> GetUserById(Guid id)
+    public async Task<UserResult> GetUserById(Guid id)
     {
-        throw new NotImplementedException();
+        var user = await _repository.GetUser(id);
+        if (user == null)
+        {
+            return new UserResult(false, ["Usuário não encontrado"]);
+        }
+
+        var userResponse = new UserDTOResponse(user.Id, user.Name, user.Email, user.PetId);
+
+        return new UserResult(true, [], userResponse);
     }
 
     public async Task<UserResult> CreateUser(UserDTO userDTO)
@@ -71,7 +77,9 @@ public class UserService : IUserService
             return new UserResult(false, errors);
         }
 
-        return new UserResult(true, errors, user);
+        var userResponse = new UserDTOResponse(user.Id, user.Name, user.Email, user.PetId);
+
+        return new UserResult(true, [], userResponse);
     }
 
     public Task<UserResult> Login(UserDTO userDTO)

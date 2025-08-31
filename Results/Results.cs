@@ -1,11 +1,10 @@
 using newapi.domain.dtos;
-using newapi.domain.entities;
 
 namespace newapi.results;
 
 public class UserResult
 {
-    public UserResult(bool Success, List<string?> Error, User? User)
+    public UserResult(bool Success, List<string?> Error, UserDTOResponse? User)
     {
         this.Success = Success;
         Errors = Error;
@@ -26,7 +25,7 @@ public class UserResult
 
     public bool Success = default!;
     private readonly List<string?> Errors = [];
-    public User? User { get; private set; }
+    public UserDTOResponse? User { get; private set; }
     public List<UserDTOResponse> UsersResponse { get; private set; } = [];
 
     public List<string?> GetErrors()

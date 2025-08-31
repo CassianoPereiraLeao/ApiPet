@@ -35,4 +35,15 @@ public class UserRepository : IUserRepository
 
         return await query.ToListAsync();
     }
+
+    public async Task<User?> GetUser(Guid id)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
+        {
+            return null;
+        }
+
+        return user;
+    }
 }
