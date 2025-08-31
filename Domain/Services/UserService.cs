@@ -1,29 +1,38 @@
 using newapi.domain.dtos;
 using newapi.domain.entities;
-using newapi.infra.data;
-using newapi.infra.interfaces;
+using newapi.domain.interfaces;
 using newapi.results;
+using newapi.infra.interfaces;
 
 namespace newapi.domain.services;
 
 public class UserService : IUserService
 {
-    private readonly AppDbContext _context;
-    public UserService(AppDbContext context)
+    private readonly IUserRepository _repository;
+    public UserService(IUserRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
-    public async Task<UserResult> GetAllUsers()
+    public async Task<UserResult> GetAllUsers(int? page)
     {
+        int limit = 30;
         List<string?> errors = [];
-        var user = new User();
-        // não faz nada é para apenas tirar um possivel erro por não ser async
-        await _context.Users.AddAsync(user);
-        // _context.SaveChanges();
-        // return new UserResult(true, null, user);
-        errors.Add("Erro ao capturar os usuários");
-        return new UserResult(false, errors);
+        var users = await _repository.GetAll(page, limit);
+        if (users == null)
+        {
+            errors.Add("Erro ao listar os usuários");
+            return new UserResult(false, errors);
+        }
+        
+        var usersModify = new List<UserDTOResponse>();
+
+        foreach (var user in users)
+        {
+            usersModify.Add(new UserDTOResponse(user.Id, user.Name, user.Email, user.PetId));
+        }
+
+        return new UserResult(true, errors, usersResponse: usersModify);
     }
 
     public Task<UserResult> GetUserById(Guid id)
@@ -33,13 +42,36 @@ public class UserService : IUserService
 
     public async Task<UserResult> CreateUser(UserDTO userDTO)
     {
+        List<string?> errors = [];
         var user = new User();
-        user.CreateEmail(userDTO.Email);
+
+        var email = user.CreateEmail(userDTO.Email);
+        if (email != null)
+        {
+            errors.Add(email);
+        }
+
+        var password = user.CreatePassword(userDTO.Password);
+        if (password != null)
+        {
+            errors.Add(password);
+        }
+
         user.CreateName(userDTO.Name);
-        user.CreatePassword(userDTO.Password);
-        await _context.Users.AddAsync(user);
-        _context.SaveChanges();
-        return new UserResult(true, [], user);
+        // Retorno antes de salvar
+        if (errors.Count > 0)
+        {
+            return new UserResult(false, errors);
+        }
+        var response = await _repository.CreateUser(user);
+        // caso algo der errado como servidor offline ou algo do tipo
+        if (response == false)
+        {
+            errors.Add("Não foi possivel criar o usuário");
+            return new UserResult(false, errors);
+        }
+
+        return new UserResult(true, errors, user);
     }
 
     public Task<UserResult> Login(UserDTO userDTO)
