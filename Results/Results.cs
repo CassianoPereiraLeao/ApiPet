@@ -17,13 +17,6 @@ public class UserResult
         Errors = Error;
     }
 
-    public UserResult(bool Success, List<string?> Error, List<User> users)
-    {
-        this.Success = Success;
-        Errors = Error;
-        Users = users;
-    }
-
     public UserResult(bool Success, List<string?> Error, List<UserDTOResponse> usersResponse)
     {
         this.Success = Success;
@@ -34,7 +27,6 @@ public class UserResult
     public bool Success = default!;
     private readonly List<string?> Errors = [];
     public User? User { get; private set; }
-    public List<User> Users { get; private set; } = [];
     public List<UserDTOResponse> UsersResponse { get; private set; } = [];
 
     public List<string?> GetErrors()
