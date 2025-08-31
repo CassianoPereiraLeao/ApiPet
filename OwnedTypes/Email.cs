@@ -7,6 +7,8 @@ public class Email
     public string _email { get; private set; } = default!;
     private string? ValidateError { get; set; } = default!;
 
+    protected Email() { }
+
     public Email(string email)
     {
         _email = email;

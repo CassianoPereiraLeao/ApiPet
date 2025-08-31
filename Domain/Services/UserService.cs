@@ -71,9 +71,9 @@ public class UserService : IUserService
         }
         var response = await _repository.CreateUser(user);
         // caso algo der errado como servidor offline ou algo do tipo
-        if (response == false)
+        if (response != null)
         {
-            errors.Add("Não foi possivel criar o usuário");
+            errors.Add(response);
             return new UserResult(false, errors);
         }
 

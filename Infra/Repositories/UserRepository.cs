@@ -12,16 +12,22 @@ public class UserRepository : IUserRepository
     {
         _context = context;
     }
-    public async Task<bool> CreateUser(User user)
+    public async Task<string?> CreateUser(User user)
     {
+        var exists = await _context.Users.AnyAsync(u => u.Email._email == user.Email._email);
+        if (exists)
+        {
+            return "Já existe esse sistema em nosso email";
+        }
+
         var createdUser = await _context.Users.AddAsync(user);
         if (createdUser == null)
         {
-            return false;
+            return "Não foi possivel salvar o usuário";
         }
-        _context.SaveChanges();
-        return true;
 
+        await _context.SaveChangesAsync();
+        return null;
     }
 
     public async Task<List<User>> GetAll(int? pages = 1, int limit = 20)

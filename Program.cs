@@ -16,7 +16,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("Default"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("Default"))
+    .LogTo(Console.WriteLine, LogLevel.Warning);
 });
 
 var app = builder.Build();

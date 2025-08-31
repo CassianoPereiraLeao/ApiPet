@@ -16,12 +16,13 @@ public class AppDbContext : DbContext
         {
             entity.OwnsOne(u => u.Email, emailOwned =>
             {
-                emailOwned.Property(e => e._email).HasColumnName("Email");
+                emailOwned.Property(e => e._email).HasColumnName("Email").IsRequired();
+                emailOwned.HasIndex(e => e._email).IsUnique();
             });
 
             entity.OwnsOne(u => u.Password, passwordOwned =>
             {
-                passwordOwned.Property(p => p._password).HasColumnName("Password");
+                passwordOwned.Property(p => p._password).HasColumnName("Password").IsRequired();
             });
         });
     }
