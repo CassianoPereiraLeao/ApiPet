@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using newapi.domain.requests;
 using newapi.domain.interfaces;
+using newapi.domain.dtos;
 
 namespace newapi.routes;
 
@@ -10,22 +11,38 @@ public static class UserRoute
     {
         var route = app.MapGroup("/api/users");
 
-        route.MapGet("/", async (IUserService userService) =>
+        route.MapGet("/", async ([FromQuery] int? page,IUserService userService) =>
         {
-            var user = await userService.GetAllUsers();
-            if (user.Success == false)
+            var response = await userService.GetAllUsers(page);
+            if (response.Success == false)
             {
-                return Results.Json(new { user.Success, Error = user.GetErrors() }, statusCode: 400);
+                return Results.Json(new { errors = response.GetErrors() }, statusCode: 400);
             }
-            return Results.Json(new { Id = "jdwndjiaw", Nome = "Usuário Exemplo" }, statusCode: 200);
-        });
+            return Results.Json(new { users = response.UsersResponse}, statusCode: 200);
+        }).WithTags("Users");
 
-        route.MapGet("/{id}", () => "Implementar dps mó preguiça");
+        route.MapGet("/{id}", ([FromRoute] string id) => "Implementar dps mó preguiça").WithTags("Users");
 
-        route.MapPost("/login", ([FromBody] UserRequest userRequest, IUserService userService) => "Implementar dps mó preguiça");
+        route.MapPost("/login", async ([FromBody] UserRequest userRequest, IUserService userService) =>
+        {
+            var user = new UserDTO(userRequest.Name,
+                userRequest.Email,
+                userRequest.Password);
 
-        route.MapPut("/{id}", ([FromBody] UserRequest userRequest) => "Implementar dps mó preguiça");
+            var response = await userService.CreateUser(user);
+            if (response.Success == false)
+            {
+                return Results.Json(new { errors = response.GetErrors() }, statusCode: 400);
+            }
+            
+            return Results.Json(new { createdUser = response.User }, statusCode: 201);
+        }).WithTags("Users");
 
-        route.MapDelete("/{id}", ([FromBody] UserRequest userRequest) => "Implementar dps mó preguiça");
+        route.MapPut("/{id}", ([FromRoute] string id,[FromBody] UserRequest userRequest) => "Implementar dps mó preguiça").WithTags("Users");
+
+        route.MapDelete("/{id}", ([FromRoute] string id) =>
+        {
+            throw new NotImplementedException();
+        }).WithTags("Users");
     }
 }
