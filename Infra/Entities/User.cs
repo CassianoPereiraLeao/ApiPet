@@ -15,15 +15,25 @@ public class User : Login
     public Password Password { get; private set; } = default!;  
     public Guid PetId { get; set; } = default!;
 
-    public void CreateEmail(Email email)
+    public string? CreateEmail(Email email)
     {
+        if (!email.IsValid())
+        {
+            return email.GetError();
+        }
         Email = email;
+        return null;
     }
 
-    public void CreatePassword(Password password)
+    public string? CreatePassword(Password password)
     {
+        if (!password.IsValid())
+        {
+            return password.GetError();
+        }
         var passwordHash = Password.ToHash(password);
         Password = new Password(passwordHash);
+        return null;
     }
 
     public string? UpdatePassword(Password password)
