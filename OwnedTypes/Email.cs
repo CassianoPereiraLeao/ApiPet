@@ -31,6 +31,7 @@ public class Email
     }
 
     public bool IsValid() => ValidateError == null;
+    public string? GetError() => ValidateError;
 
     public override string ToString()
     {

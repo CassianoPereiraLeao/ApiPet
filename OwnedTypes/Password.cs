@@ -1,37 +1,41 @@
-using BCrypt.Net;
-
 namespace newapi.ownedtypes;
 
 public class Password
 {
     public string _password { get; private set; } = default!;
+    private string? ValidateError { get; set; } = default!;
 
     protected Password() { }
 
     public Password(string password)
     {
-        _password = Validate(password);
+        _password = password;
+        ValidateError = Validate(password);
     }
 
-    private string Validate(string password)
+    private string? Validate(string password)
     {
         if (string.IsNullOrEmpty(password))
         {
-            throw new ArgumentNullException("A senha não pode ser vazia");
+            return "O campo senha não pode ser vazio";
         }
 
         if (password.Length < 8)
         {
-            throw new ArgumentException("A senha deve conter mais de 8 caracteres");
+            return "A senha deve conter no mínimo 8 caracteres";
         }
 
-        return password;
+        return null;
     }
 
     public static string ToHash(Password password)
     {
         return BCrypt.Net.BCrypt.HashPassword(password.ToString());
     }
+
+    public bool IsValid() => ValidateError == null;
+
+    public string? GetError() => ValidateError;
 
     public bool Verify(string password)
     {
