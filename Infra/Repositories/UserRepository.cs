@@ -17,7 +17,7 @@ public class UserRepository : IUserRepository
         var exists = await _context.Users.AnyAsync(u => u.Email._email == user.Email._email);
         if (exists)
         {
-            return "Já existe esse sistema em nosso email";
+            return "Já existe esse email em nosso sistema";
         }
 
         var createdUser = await _context.Users.AddAsync(user);
@@ -33,11 +33,12 @@ public class UserRepository : IUserRepository
     public async Task<List<User>> GetAll(int? pages = 1, int limit = 20)
     {
         var currentPage = pages ?? 1;
-        var query = _context.Users
-        .AsQueryable()
-        .OrderBy(u => u.Id)
-        .Skip((currentPage - 1) * limit)
-        .Take(limit);
+        var users = _context.Users;
+        
+        var query = users.AsQueryable();
+        query = query.OrderBy(u => u.Name);
+        query = query.Skip((currentPage - 1) * limit);
+        query = query.Take(limit);
 
         return await query.ToListAsync();
     }
@@ -50,6 +51,22 @@ public class UserRepository : IUserRepository
             return null;
         }
 
+        return user;
+    }
+
+    public async Task<User?> UpdateUser(Guid id, User user)
+    {
+        var userResponse = await _context.Users.FindAsync(id);
+
+        if (userResponse != null)
+        {
+            userResponse.UpdateName(user.Name);
+            userResponse.UpdateProfile(user.Profile);
+            userResponse.UpdatePassword(user.Password);
+            userResponse.UpdateEmail(user.Email);
+            _context.Users.Update(userResponse);
+            await _context.SaveChangesAsync();
+        }
         return user;
     }
 }

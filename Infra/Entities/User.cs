@@ -25,25 +25,41 @@ public class User : Login
         return null;
     }
 
+    public string? UpdateEmail(Email newEmail)
+    {
+        if (newEmail.IsValid())
+            return newEmail.GetError();
+
+        Email = newEmail;
+        return null;
+    }
+
     public string? CreatePassword(Password password)
     {
         if (!password.IsValid())
         {
             return password.GetError();
         }
+
         var passwordHash = Password.ToHash(password);
         Password = new Password(passwordHash);
         return null;
     }
 
-    public string? UpdatePassword(Password password)
+    public string? UpdatePassword(Password newPassword)
     {
-        if (!Password.Verify(password.ToString()))
+        if (Password == null)
+            return "Usuário não possui senha definida.";
+
+        if (Password.Verify(newPassword.ToString()))
+            return "A nova senha não pode ser igual à antiga.";
+
+        if (!newPassword.IsValid())
         {
-            return "A senha não pode ser a mesma que a antiga";
-        } // a senha não pode ser a mesma q a antiga
-        var passwordHash = Password.ToHash(password);
-        Password = new Password(passwordHash);
-        return null;
+            return newPassword.GetError();
+        }
+
+        Password = new Password(Password.ToHash(newPassword));
+        return Password.ToString();
     }
 }

@@ -24,6 +24,10 @@ public class AppDbContext : DbContext
             {
                 passwordOwned.Property(p => p._password).HasColumnName("Password").IsRequired();
             });
+            entity.OwnsOne(u => u.Profile, profileOwned =>
+            {
+                profileOwned.Property(profile => profile._profile).HasColumnName("Profile").IsRequired();
+            });
         });
     }
 }

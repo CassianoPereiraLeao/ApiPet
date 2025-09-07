@@ -25,11 +25,29 @@ public class UserResult
 
     public bool Success = default!;
     private readonly List<string?> Errors = [];
+    public UserDTO? userDTO { get; set; }
     public UserDTOResponse? User { get; private set; }
     public List<UserDTOResponse> UsersResponse { get; private set; } = [];
+    public string Token { get; private set; } = default!;
+
+    public string? SecurityToken(string token)
+    {
+        if (string.IsNullOrEmpty(token))
+        {
+            return "failt";
+        }
+
+        Token = token;
+        return null;
+    }
 
     public List<string?> GetErrors()
     {
         return Errors;
+    }
+
+    public string GetToken()
+    {
+        return Token;
     }
 }
