@@ -22,19 +22,22 @@ Esta API foi desenvolvida para facilitar o processo de adoção de animais, perm
    cd ApiPet
 
 
-Restaure as dependências:
+2. Restaure as dependências:
 
-dotnet restore
-
-
-Aplique as migrações para configurar o banco de dados:
-
-dotnet ef database update
+    ```bash
+    dotnet restore
 
 
-Inicie a aplicação:
+3. Aplique as migrações para configurar o banco de dados:
 
-dotnet run
+    ```bash
+    dotnet ef database update
+
+
+4. Inicie a aplicação:
+
+    ```bash
+    dotnet run
 
 
 A API estará disponível em https://localhost:5001.
